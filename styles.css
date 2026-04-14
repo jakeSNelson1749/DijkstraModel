@@ -1,0 +1,11 @@
+.heading{
+    font-size: xx-large;
+    color: black;
+    text-align: center;
+}
+body{
+    background-color: tan;
+}
+.valid_graph_flag{
+    color: green;
+}
