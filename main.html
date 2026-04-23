@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" href="styles.css">
     <title>Dijkstra Model</title>
+    <script src = "Dijkstras.js" defer></script>
 </head>
 <body>
     <div class = "heading">
@@ -10,15 +11,8 @@
     </div>
     <p>Jake and Chris mini project for Discrete Structures II</p>
     <div class ="valid_graph_flag">
-        <p id="flag">default</p>
-        <button onclick="test_function()">CLICK ME!!!!</button>
+        <p id="flag">Unclicked label</p>
+        <button onclick="button_pressed()">Click to add vertex</button>
     </div>
-    <script>
-        function test_function(){
-            let str = "pressed";
-            document.getElementById("flag").textContent = str;
-            document.getElementById("flag").style.color = "red";
-        }
-    </script>
 </body>
 </html>
