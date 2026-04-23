@@ -25,6 +25,6 @@ function button_pressed(){
     myGraph.print_vertices();
 }
 
-const myGraph = new Graph();
+const currentGraph = new Graph();
 let index = 0;
 //myGraph.add_vertex("A");

@@ -6,6 +6,11 @@ svgs.addEventListener('click', (event) => {
 
 function vertexOnClick(event){
     const point = svgs.createSVGPoint();
+    
+    //will be replaced by actual vertex names
+    index = index +1;
+    currentGraph.add_vertex(index.toString());
+    currentGraph.print_vertices();
 
     point.x = event.clientX;
     point.y = event.clientY;
