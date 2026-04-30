@@ -20,6 +20,41 @@ const edgeList = [];
 let vertexSelected = null;
 let vertexIdCounter = 0;
 
+// UMKC demo data with preset vertices and edges
+const UMKC_DEMO = {
+    // Used LLM to generate coordinates for vertices based on a jpg map of UMKC, not perfect but good enough for demo purposes
+    vertices: [
+        { label: "Katz Hall", x: 930, y: 700 },
+        { label: "Student Union", x: 360, y: 760 },
+        { label: "Swinney Center", x: 575, y: 610 },
+        { label: "Miller Nichols", x: 760, y: 800 },
+
+        { label: "Bloch Hall", x: 375, y: 900 },
+        { label: "School of Law", x: 315, y: 1150 },
+
+        { label: "School of Education", x: 600, y: 1210 },
+        { label: "Royall Hall", x: 725, y: 1050 },
+        { label: "Rockhill Garage", x: 850, y: 1150 }
+    ],
+
+    edges: [
+        { from: "Bloch Hall", to: "School of Law", weight: 2 },
+        { from: "School of Law", to: "School of Education", weight: 4 },
+
+        { from: "Student Union", to: "Swinney Center", weight: 2 },
+        { from: "Swinney Center", to: "Miller Nichols", weight: 2 },
+        { from: "Miller Nichols", to: "Katz Hall", weight: 3 },
+
+        { from: "School of Education", to: "Royall Hall", weight: 2 },
+        { from: "Royall Hall", to: "Rockhill Garage", weight: 1 },
+        { from: "Rockhill Garage", to: "Miller Nichols", weight: 3 },
+        { from: "Rockhill Garage", to: "School of Education", weight: 1 },
+
+        { from: "Student Union", to: "Miller Nichols", weight: 2 },
+        { from: "Bloch Hall", to: "Student Union", weight: 3 }
+    ]
+};
+
 // Listen for a click event on the SVG element, check if its on a vertex
 svgs.addEventListener('click', (event) => {
     // detects if vertex element is clicked
@@ -115,6 +150,7 @@ svgs.addEventListener('click', (event) => {
             weightText.setAttribute("x", midX);
             weightText.setAttribute("y", midY - 5);
             weightText.setAttribute("text-anchor", "middle");
+            weightText.setAttribute("font-size", "30");
             weightText.textContent = weight;
 
             // Add the line and weight text to the SVG
@@ -136,6 +172,118 @@ function addToDropdowns(value){
     const option2 = new Option(value, value);
     sselect.add(option);
     eselect.add(option2);
+}
+
+// FUnction for resetting the graph and clearing all vertices and edges from the display and data structure
+function resetGraphDemo() {
+    svgs.innerHTML = `<rect width="1200" height="1553" fill="white" />`;
+
+    vertexList.length = 0;
+    edgeList.length = 0;
+    vertexSelected = null;
+    vertexIdCounter = 0;
+
+    currentGraph.vertices.clear();
+
+    document.getElementById("adj-list").textContent = "Vertices:\n EMPTY";
+    document.getElementById("results").textContent = "";
+
+    document.getElementById("start_select").innerHTML =
+        `<option value="">Select starting vertex</option>`;
+
+    document.getElementById("end_select").innerHTML =
+        `<option value="">Select ending vertex</option>`;
+}
+
+// Creates a vertex for the demo with given label and coordinates
+function createDemoVertex(label, x, y) {
+    const vertex = {
+        id: vertexIdCounter,
+        label: label,
+        x: x,
+        y: y
+    };
+
+    vertexList.push(vertex);
+    currentGraph.add_vertex(label);
+    addToDropdowns(label);
+
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", x);
+    circle.setAttribute("cy", y);
+    circle.setAttribute("r", 30);
+    circle.setAttribute("fill", "blue");
+    circle.dataset.vertexId = vertex.id;
+
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", x);
+    text.setAttribute("y", y - 28);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("font-size", "30");
+    text.textContent = label;
+    text.dataset.vertexId = vertex.id;
+
+    svgs.appendChild(circle);
+    svgs.appendChild(text);
+
+    vertexIdCounter++;
+}
+
+// Creates demo edges
+function createDemoEdge(startLabel, endLabel, weight) {
+    const firstVertex = vertexList.find(vertex => vertex.label === startLabel);
+    const secondVertex = vertexList.find(vertex => vertex.label === endLabel);
+
+    if (!firstVertex || !secondVertex) {
+        return;
+    }
+
+    edgeList.push({
+        startId: firstVertex.id,
+        endId: secondVertex.id,
+        weight: weight
+    });
+
+    currentGraph.add_edge(startLabel, endLabel, weight);
+
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", firstVertex.x);
+    line.setAttribute("y1", firstVertex.y);
+    line.setAttribute("x2", secondVertex.x);
+    line.setAttribute("y2", secondVertex.y);
+    line.setAttribute("stroke", "black");
+    line.setAttribute("stroke-width", "5");
+
+    const midX = (firstVertex.x + secondVertex.x) / 2;
+    const midY = (firstVertex.y + secondVertex.y) / 2;
+
+    const weightText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    weightText.setAttribute("x", midX);
+    weightText.setAttribute("y", midY - 10);
+    weightText.setAttribute("text-anchor", "middle");
+    weightText.setAttribute("font-size", "24");
+    weightText.setAttribute("fill", "black");
+    weightText.textContent = weight;
+
+    svgs.appendChild(line);
+    svgs.appendChild(weightText);
+}
+
+// Loads the UMKC demo graph with preset vertices and edges onto the display and data structure
+function loadUMKCDemo() {
+    resetGraphDemo();
+
+    document.getElementById("demo-map-section").classList.remove("hidden");
+
+    UMKC_DEMO.vertices.forEach(vertex => {
+        createDemoVertex(vertex.label, vertex.x, vertex.y);
+    });
+
+    UMKC_DEMO.edges.forEach(edge => {
+        createDemoEdge(edge.from, edge.to, edge.weight);
+    });
+
+    currentGraph.print_vertices();
 }
 
 function vertexOnClick(event){
@@ -173,13 +321,14 @@ function vertexOnClick(event){
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     circle.setAttribute("cx", x);
     circle.setAttribute("cy", y);
-    circle.setAttribute("r", 20);
+    circle.setAttribute("r", 30);
     circle.setAttribute("fill", "blue");
 
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     text.setAttribute("x", x);
-    text.setAttribute("y", y - 25);
+    text.setAttribute("y", y - 40);
     text.setAttribute("text-anchor", "middle");
+    text.setAttribute("font-size", "30");
     text.textContent = label;
 
     // Add vertex to graph data structure and update display
@@ -198,3 +347,5 @@ function vertexOnClick(event){
 
     vertexIdCounter = vertexIdCounter + 1;
 }
+
+document.getElementById("run-demo-btn").addEventListener("click", loadUMKCDemo);
