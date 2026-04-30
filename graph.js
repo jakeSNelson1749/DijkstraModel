@@ -7,8 +7,11 @@
 // - Clean up data consistency between graph data structure and svg elements when vertices are deleted
 // - Make weight visible on verticle edges
 
+// ------- BUGS - JAKE -----\
+// - When invalid edge entered vertex remains selected
+
 // ------- FEATURES TO ADD -------
-// - Ability to remove vertices and edges
+// - ability to remove vertices and edges
 // - Shortest path visualization (dijkstra's algorithm)
 
 const svgs = document.getElementsByTagName('svg')[0];
@@ -67,10 +70,17 @@ svgs.addEventListener('click', (event) => {
             const secondVertex = vertexList.find(vertex => vertex.id.toString() === secondVertexId);
 
             // Prompt user to input weight for the edge, throw error if empty or null
-            const weight = prompt("Enter edge weight:");
-
-            if (weight === null || weight.trim() === "") {
+            let weight = prompt("Enter edge weight:");
+            weight = weight.trim();
+            if (weight === null || weight === "") {
                 alert("Edge creation cancelled.");
+                return;
+            }
+            if(!isNaN(Number(weight)) && Number(weight) >= 1){
+                weight = Number(weight);
+            }
+            else{
+                alert("Weight must be a positive number, edge canceled");
                 return;
             }
 
@@ -82,6 +92,10 @@ svgs.addEventListener('click', (event) => {
             }
 
             edgeList.push(edge);
+
+            //add edge to data structure and update lists
+            currentGraph.add_edge(firstVertex.label, secondVertex.label, weight);
+            currentGraph.print_vertices();
 
             // Create the SVG elements for the edge line
             const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -113,6 +127,16 @@ svgs.addEventListener('click', (event) => {
         }
     }
 });
+
+function addToDropdowns(value){
+    const sselect = document.getElementById("start_select");
+    const eselect = document.getElementById("end_select");
+
+    const option = new Option(value, value);
+    const option2 = new Option(value, value);
+    sselect.add(option);
+    eselect.add(option2);
+}
 
 function vertexOnClick(event){
     const point = svgs.createSVGPoint();
@@ -158,9 +182,12 @@ function vertexOnClick(event){
     text.setAttribute("text-anchor", "middle");
     text.textContent = label;
 
-    // Add vertex to graph data structure and print vertices
-    currentGraph.add_vertex(vertex);
+    // Add vertex to graph data structure and update display
+    currentGraph.add_vertex(vertex.label);
     currentGraph.print_vertices();
+
+    // Add vertex to drop down menus
+    addToDropdowns(vertex.label);
 
     // Add to dataset for later retrieval of vertex information when clicked
     circle.dataset.vertexId = vertex.id;

@@ -9,6 +9,10 @@ body{
 .valid_graph_flag{
     color: green;
 }
-.svg_container{
-
+#adj-list{
+    color: green;
+    white-space: pre-line;
+}
+#results{
+    white-space: pre-line;
 }

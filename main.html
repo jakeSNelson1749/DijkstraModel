@@ -28,9 +28,22 @@
         </svg>
     </div>
 
-    <div class ="valid_graph_flag">
-        <p id="flag">Unclicked label</p>
-        <button onclick="button_pressed()">Click to add vertex</button>
+    <div class ="input-output">
+        <p id="adj-list">Unclicked label</p>
+        <!--<button onclick="button_pressed()">Click to add vertex</button>-->
+
+        <!-- top down menu for selecting start and end vertices (adds vertices dynamically)-->
+        <select id = "start_select">
+            <option value = "">Select starting vertex</option>
+        </select>
+        <select id = "end_select">
+            <option value = "">Select ending vertex</option>
+
+        </select>
+    </div>
+    <div class="algorithm">
+        <button onclick="button_pressed()">Run Dijkstras!</button>
+        <p id="results"></p>
     </div>
 
 </body>
