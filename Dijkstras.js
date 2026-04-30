@@ -44,7 +44,7 @@ class Graph{
         //implement remove edge later
         return;
     }
-    //updates the label with the adjacency list
+    //updates the <p> with the adjacency list
     print_vertices(){
         // convert adjacency list into readable strings
         document.getElementById("adj-list").textContent = "Vertices:";
