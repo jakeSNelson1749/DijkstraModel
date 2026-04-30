@@ -15,4 +15,5 @@ body{
 }
 #results{
     white-space: pre-line;
+    font-size: large;
 }
